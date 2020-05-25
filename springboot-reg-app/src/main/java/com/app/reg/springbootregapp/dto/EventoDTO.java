@@ -8,7 +8,7 @@ import com.app.reg.springbootregapp.dominio.Evento;
 
 public class EventoDTO {
 	
-	private Long id;
+	private String id;
 	private String nome;
 	private Date data;
 	private String local;
@@ -24,10 +24,10 @@ public class EventoDTO {
 		return eventos.map(EventoDTO::new);
 	}
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getNome() {

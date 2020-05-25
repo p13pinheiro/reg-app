@@ -1,13 +1,14 @@
 package com.app.reg.springbootregapp.controller;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,11 +36,10 @@ import com.app.reg.springbootregapp.dto.EventoDTO;
 import com.app.reg.springbootregapp.form.AdicaoParticipanteForm;
 import com.app.reg.springbootregapp.form.AdicaoProdutosForm;
 import com.app.reg.springbootregapp.form.EdicaoEventoForm;
+import com.app.reg.springbootregapp.form.EdicaoProdutoForm;
 import com.app.reg.springbootregapp.form.EventoForm;
 import com.app.reg.springbootregapp.ifacade.IEventoFacade;
 import com.app.reg.springbootregapp.repository.EventoRepository;
-import com.app.reg.springbootregapp.repository.ParticipanteRepository;
-import com.app.reg.springbootregapp.repository.ProdutoRepository;
 
 @RestController
 @RequestMapping("/eventos")
@@ -47,10 +47,6 @@ public class EventoController {
 
 	@Autowired
 	private EventoRepository eventoRepository; 
-	@Autowired
-	private ParticipanteRepository participanteRepository;
-	@Autowired
-	private ProdutoRepository produtoRepository;
 	@Autowired
 	private IEventoFacade eventoFacade;
 	
@@ -68,7 +64,7 @@ public class EventoController {
 	@Transactional
 	@CacheEvict(value="listaDeEventos", allEntries = true)
 	public ResponseEntity<EventoDTO> criar(@RequestBody @Valid EventoForm form, UriComponentsBuilder uriBuilder) {
-		Evento evento = form.converter(participanteRepository,produtoRepository);
+		Evento evento = form.converter();
 		eventoRepository.save(evento);
 		
 		URI uri = uriBuilder.path("/eventos/{id}").buildAndExpand(evento.getId()).toUri();
@@ -76,8 +72,8 @@ public class EventoController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<DetalheEventoDTO> detalhar(@PathVariable Long id){
-		Optional<Evento> optional = eventoRepository.findById(id);
+	public ResponseEntity<DetalheEventoDTO> detalhar(@PathVariable String id){
+		Optional<Evento> optional = eventoRepository.findById(new ObjectId(id));
 		
 		if(optional.isPresent()) {
 			DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(optional.get());
@@ -90,13 +86,13 @@ public class EventoController {
 	@PutMapping("/{id}")
 	@Transactional
 	@CacheEvict(value="listaDeEventos", allEntries = true)
-	public ResponseEntity<EventoDTO> editar(@PathVariable Long id, @RequestBody @Valid EdicaoEventoForm form){
-		Optional<Evento> optional = eventoRepository.findById(id);
+	public ResponseEntity<EventoDTO> editar(@PathVariable String id, @RequestBody @Valid EdicaoEventoForm form){
+		Optional<Evento> optional = eventoRepository.findById(new ObjectId(id));
 		
 		if(optional.isPresent()) {
 			Evento evento = optional.get();
 			form.editar(evento);
-			
+			eventoRepository.save(evento);
 			return ResponseEntity.ok(new EventoDTO(evento));
 		}
 		
@@ -106,86 +102,116 @@ public class EventoController {
 	@DeleteMapping("/{id}")
 	@Transactional
 	@CacheEvict(value="listaDeEventos", allEntries = true)
-	public ResponseEntity<?> excluir(@PathVariable Long id){
-		Optional<Evento> optional = eventoRepository.findById(id);
+	public ResponseEntity<?> excluir(@PathVariable String id){
+		ObjectId idObj = new ObjectId(id);
+		Optional<Evento> optional = eventoRepository.findById(idObj);
+		
 		if(optional.isPresent()) {
-			eventoRepository.delete(optional.get());
+			eventoRepository.deleteById(idObj);
 			return ResponseEntity.ok().build();
 		}
 		
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PostMapping("/{id}/participantes")
+	@PutMapping("/{id}/participantes")
 	@Transactional
-	public ResponseEntity<DetalheEventoDTO> adicionarParticipante(@RequestBody @Valid 	AdicaoParticipanteForm form, @PathVariable("id") Long id){
-		List<Participante> participantes = new ArrayList<Participante>();
-		Optional<Evento> optionalEvento = eventoRepository.findById(id);
-		if(optionalEvento.isPresent()){
-			Evento evento = optionalEvento.get();
+	@CacheEvict(value="listaDeEventos", allEntries = true)
+	public ResponseEntity<DetalheEventoDTO> adicionarParticipante(@RequestBody @Valid AdicaoParticipanteForm form, @PathVariable String id){
+		Optional<Evento> optional = eventoRepository.findById(new ObjectId(id));
+		if(optional.isPresent()){
+			Evento evento = optional.get();
 			
-			form.getParticipanteIds().forEach(p -> {
-				Optional<Participante> optional = participanteRepository.findById(p);
-				if(optional.isPresent()) {
-					participantes.add(optional.get());
-				}
-			});
+			List<Participante> participantes = form.converter();
 	
 			evento.getParticipantes().addAll(participantes);
 			DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(evento);
-			
+			eventoRepository.save(evento);
 			return ResponseEntity.ok(detalheEventoDTO); 
 		}
 		return ResponseEntity.notFound().build(); 
 	}
 	
-	@PostMapping("/{id}/produtos")
+	@PutMapping("/{id}/produtos")
 	@Transactional
-	public ResponseEntity<DetalheEventoDTO> adicionarProduto(@RequestBody @Valid AdicaoProdutosForm form, @PathVariable("id") Long id){
-		List<Produto> produtos = new ArrayList<Produto>();
-		Optional<Evento> optionalEvento = eventoRepository.findById(id);
+	@CacheEvict(value="listaDeEventos", allEntries = true)
+	public ResponseEntity<DetalheEventoDTO> adicionarProduto(@RequestBody @Valid AdicaoProdutosForm form, @PathVariable("id") String id){
+		Optional<Evento> optionalEvento = eventoRepository.findById(new ObjectId(id));
 
 		if(optionalEvento.isPresent()){
 			Evento evento = optionalEvento.get();
-			form.getProdutoIds().forEach(p -> {
-				Optional<Produto> optional = produtoRepository.findById(p);
-				if(optional.isPresent()) {
-					produtos.add(optional.get());
-				}
-			});
-			
+			List<Produto> produtos = form.converter();
 			evento.getProdutos().addAll(produtos);
 			DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(evento);
+			eventoRepository.save(evento);
 			return ResponseEntity.ok(detalheEventoDTO);
 		}
 		
 		return ResponseEntity.notFound().build(); 
 	}
 	
-	@DeleteMapping("{id}/produtos/{idProduto}")
+	@DeleteMapping("{id}/produtos")
 	@Transactional
-	public ResponseEntity<?> excluirProdutos(@PathVariable("id") Long id, @PathVariable("idProduto") Long idProduto){
-		Optional<Evento> optional = eventoRepository.findById(id);
-		Optional<Produto> produtoOptional = produtoRepository.findById(idProduto);
+	public ResponseEntity<?> excluirProduto(@PathVariable String id, @PathParam("nome") String nome){
+		ObjectId objectId = new ObjectId(id);
+		Optional<Evento> optional = eventoRepository.findById(objectId);
 		
-		if(optional.isPresent() && produtoOptional.isPresent()){
-			optional.get().getProdutos().remove(produtoOptional.get());
+		if(optional.isPresent() ){
+			Evento evento = optional.get();
+			List<Produto> listaProdutos = evento.getProdutos(); 
+			Optional<Produto> produtoOptional = listaProdutos.stream().filter(p-> p.getNome().equals(nome)).findAny();
 			
-			return ResponseEntity.ok().build();
+			if(produtoOptional.isPresent()) {
+				listaProdutos.remove(produtoOptional.get());
+				
+				DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(evento);
+				eventoRepository.save(evento);
+				return ResponseEntity.ok(detalheEventoDTO);
+			}
 		}
 		return ResponseEntity.notFound().build(); 
 	}
 	
-	@DeleteMapping("{id}/participantes/{idParticipante}")
+	@DeleteMapping("{id}/participantes")
 	@Transactional
-	public ResponseEntity<?> excluirParticipantes(@PathVariable("id") Long id, @PathVariable("idParticipante") Long idParticipante){
-		Optional<Evento> optional = eventoRepository.findById(id);
-		Optional<Participante> participanteOptional = participanteRepository.findById(idParticipante);
+	public ResponseEntity<?> excluirParticipantes(@PathVariable String id, @PathParam("nome") String nome){
+		Optional<Evento> optional = eventoRepository.findById(new ObjectId(id));
 		
-		if(optional.isPresent() && participanteOptional.isPresent()){
-			optional.get().getParticipantes().remove(participanteOptional.get());
+		if(optional.isPresent()) {
+			Evento evento = optional.get();
+			List<Participante> participantes = evento.getParticipantes();
+			Optional<Participante> participanteOptional = participantes.stream().filter(p -> p.getNome().equals(nome)).findAny();
 			
-			return ResponseEntity.ok().build();
+			if(participanteOptional.isPresent()) {
+				participantes.remove(participanteOptional.get());
+				
+				DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(evento);
+				eventoRepository.save(evento);
+				return ResponseEntity.ok(detalheEventoDTO);
+			}
+		}
+		
+		return ResponseEntity.notFound().build(); 
+	}
+	
+	@PutMapping("{id}/produto")
+	@Transactional
+	public ResponseEntity<?> editarProduto(@PathVariable String id, @PathParam("nome") String nome, @RequestBody @Valid EdicaoProdutoForm form){
+		ObjectId objectId = new ObjectId(id);
+		Optional<Evento> optional = eventoRepository.findById(objectId);
+		
+		if(optional.isPresent() ){
+			Evento evento = optional.get();
+			List<Produto> listaProdutos = evento.getProdutos(); 
+			Optional<Produto> produtoOptional = listaProdutos.stream().filter(p-> p.getNome().equals(nome)).findAny();
+			
+			if(produtoOptional.isPresent()) {
+				form.editar(produtoOptional.get());
+				
+				DetalheEventoDTO detalheEventoDTO = eventoFacade.preencherCamposEvento(evento);
+				eventoRepository.save(evento);
+				return ResponseEntity.ok(detalheEventoDTO);
+			}
 		}
 		return ResponseEntity.notFound().build(); 
 	}

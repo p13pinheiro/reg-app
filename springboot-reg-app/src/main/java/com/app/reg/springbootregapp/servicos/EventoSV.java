@@ -44,7 +44,10 @@ public class EventoSV implements SV{
 	}
 
 	private Double calcularValorTotal(Evento evento) {
-		return evento.getProdutos().stream().mapToDouble(Produto::getPreco).sum();
+		if(evento.getProdutos() !=  null) {
+			return evento.getProdutos().stream().mapToDouble(Produto::getPreco).sum();
+		}
+		return null;
 	}
 	
 //	public DetalheEventoDTO adicionarProduto(AdicaoProdutosForm form, Long id){

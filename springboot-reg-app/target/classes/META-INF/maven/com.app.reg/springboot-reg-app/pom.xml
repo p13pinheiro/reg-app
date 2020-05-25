@@ -12,7 +12,7 @@
 	</parent>
 	<groupId>com.app.reg</groupId>
 	<artifactId>springboot-reg-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>2.2.2</version>
 	<packaging>jar</packaging>
 	
 	<name>springboot-reg-app</name>
@@ -84,7 +84,15 @@
 		    <artifactId>jjwt</artifactId>
 		    <version>0.9.1</version>
 		</dependency>
-				
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>	
+		<dependency>
+	        <groupId>org.mongodb</groupId>
+	        <artifactId>mongodb-driver-sync</artifactId>
+        <version>4.0.3</version>
+    </dependency>	
 	</dependencies>
 
 	<build>

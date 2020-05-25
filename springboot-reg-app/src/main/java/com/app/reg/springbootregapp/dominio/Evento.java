@@ -3,9 +3,6 @@ package com.app.reg.springbootregapp.dominio;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
@@ -15,13 +12,12 @@ import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-@Entity
 public class Evento {
 	
 	public Evento() {
 	}
 
-	public Evento(Long id, String nome, Date data, String local, List<Participante> participantes, List<Produto> produtos) {
+	public Evento(String id, String nome, Date data, String local, List<Participante> participantes, List<Produto> produtos) {
 		this.id = id;
 		this.nome = nome;
 		this.data = data;
@@ -46,8 +42,7 @@ public class Evento {
 
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String id;
 	
 	@Length(max = 50)
 	@NotNull
@@ -69,10 +64,10 @@ public class Evento {
 	@Cascade(CascadeType.MERGE)
 	private List<Produto> produtos;
 	
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getNome() {

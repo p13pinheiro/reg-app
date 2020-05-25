@@ -1,16 +1,19 @@
 package com.app.reg.springbootregapp.repository;
 
+import java.util.Optional;
+
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.app.reg.springbootregapp.dominio.Evento;
 
-@Repository
-public interface EventoRepository extends JpaRepository<Evento, Long> {
+public interface EventoRepository extends MongoRepository<Evento, ObjectId> {
 
 	Page<Evento> findByNome(String nome, Pageable paginacao);
+
+	Optional<Evento> findByIdAndProdutosNome(ObjectId id,String nome);
 
 
 }
