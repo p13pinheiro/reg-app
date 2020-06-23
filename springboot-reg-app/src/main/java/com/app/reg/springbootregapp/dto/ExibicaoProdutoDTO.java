@@ -6,10 +6,12 @@ public class ExibicaoProdutoDTO {
 
 	private String nome;
 	private Double preco;
+	private Integer quantidade;
 	
 	public ExibicaoProdutoDTO(Produto produto) {
 		this.nome = produto.getNome();
 		this.preco = produto.getPreco();
+		this.quantidade = produto.getQuantidade();
 	}
 	public String getNome() {
 		return nome;
@@ -17,6 +19,9 @@ public class ExibicaoProdutoDTO {
 
 	public Double getPreco() {
 		return preco;
+	}
+	public Integer getQuantidade() {
+		return quantidade;
 	}
 	
 }

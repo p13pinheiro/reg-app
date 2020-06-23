@@ -11,7 +11,7 @@ import com.app.reg.springbootregapp.dominio.Evento;
 
 public interface EventoRepository extends MongoRepository<Evento, ObjectId> {
 
-	Page<Evento> findByNome(String nome, Pageable paginacao);
+	Page<Evento> findByNomeLike(String nome, Pageable paginacao);
 
 	Optional<Evento> findByIdAndProdutosNome(ObjectId id,String nome);
 

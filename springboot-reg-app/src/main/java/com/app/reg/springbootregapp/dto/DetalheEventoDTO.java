@@ -1,52 +1,45 @@
 package com.app.reg.springbootregapp.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.app.reg.springbootregapp.dominio.Evento;
-import com.app.reg.springbootregapp.ifacade.IEventoFacade;
-import com.app.reg.springbootregapp.vo.ValorAgredadoEvento;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class DetalheEventoDTO {
 
 	private String id;
 	private String nome;
-	private Date data;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+	private LocalDateTime data;
 	private String local;
 	private List<ExibicaoParticipanteDTO> participantes = new ArrayList<ExibicaoParticipanteDTO>();
 	private List<ExibicaoProdutoDTO> produtos = new ArrayList<ExibicaoProdutoDTO>();
-	private double valorTotal;
-	private double valorPorParticipante;
+	private Double valorTotal;
+	private Double valorPorParticipante;
 	
 	public DetalheEventoDTO() {}
-	
-	public DetalheEventoDTO(String id, String nome, Date data, String local, List<ExibicaoParticipanteDTO> participantes,List<ExibicaoProdutoDTO> produtos, double valorTotal, double valorPorParticipante) {
-		this.id = id;
-		this.nome = nome;
-		this.data = data;
-		this.local = local;
-		this.participantes = participantes;
-		this.produtos = produtos;
-		this.valorTotal = valorTotal;
-		this.valorPorParticipante = valorPorParticipante;
-	}
-	
-	public DetalheEventoDTO(Evento evento, IEventoFacade eventoFacade){
+
+	public DetalheEventoDTO(Evento evento) {
+		List<ExibicaoParticipanteDTO> participantes = null;
+		if(evento.getParticipantes() != null && !evento.getParticipantes().isEmpty()) {
+			participantes = evento.getParticipantes().stream().map(ExibicaoParticipanteDTO::new).collect(Collectors.toList());
+		}
+		List<ExibicaoProdutoDTO> produtos = null;
+		if(evento.getProdutos() != null && !evento.getProdutos().isEmpty()) {
+			produtos = evento.getProdutos().stream().map(ExibicaoProdutoDTO::new).collect(Collectors.toList());
+		}
 		this.id = evento.getId();
 		this.nome = evento.getNome();
 		this.data = evento.getData();
 		this.local = evento.getLocal();
-		this.participantes.addAll(evento.getParticipantes().stream().map(ExibicaoParticipanteDTO::new).collect(Collectors.toList()));
-		this.produtos.addAll(evento.getProdutos().stream().map(ExibicaoProdutoDTO::new).collect(Collectors.toList()));
-		setValorCalculado(evento,eventoFacade);
-	}
-	
-	private void setValorCalculado(Evento evento,IEventoFacade eventoFacade) {
-		ValorAgredadoEvento calcularValorAgredado = eventoFacade.calcularValorAgredado(evento);
-		this.valorTotal = calcularValorAgredado.getValorTotal();
-		this.valorPorParticipante = calcularValorAgredado.getValorPorParticipante();
+		this.participantes = participantes;
+		this.produtos = produtos;
+		this.valorTotal = evento.getValorTotal();
+		this.valorPorParticipante = evento.getValorPorParticipante(evento.getValorTotal());
+		
 	}
 
 	public String getId() {
@@ -57,7 +50,7 @@ public class DetalheEventoDTO {
 		return nome;
 	}
 
-	public Date getData() {
+	public LocalDateTime getData() {
 		return data;
 	}
 

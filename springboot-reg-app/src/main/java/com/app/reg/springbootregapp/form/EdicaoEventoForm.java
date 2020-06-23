@@ -1,27 +1,30 @@
 package com.app.reg.springbootregapp.form;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.app.reg.springbootregapp.dominio.Evento;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class EdicaoEventoForm {
 
-	@NotNull
+	@NotNull @NotEmpty
 	private String nome;
 	
-	@NotNull
-	private Date data;
+	@NotNull 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+	private LocalDateTime data;
 	
-	@NotNull
+	@NotNull @NotEmpty
 	private String local;
 
-	public Date getData() {
+	public LocalDateTime getData() {
 		return data;
 	}
 
-	public void setData(Date data) {
+	public void setData(LocalDateTime data) {
 		this.data = data;
 	}
 

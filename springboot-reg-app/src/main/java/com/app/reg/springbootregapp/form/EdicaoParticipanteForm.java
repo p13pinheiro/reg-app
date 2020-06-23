@@ -14,7 +14,7 @@ public class EdicaoParticipanteForm {
 
 	public EdicaoParticipanteForm(Participante participante) {
 		this.nome = participante.getNome();
-		this.endereco = participante.getEndereco();
+//		this.endereco = participante.getEndereco();
 	}
 	
 	public String getNome() {
@@ -32,7 +32,7 @@ public class EdicaoParticipanteForm {
 
 	public Participante editar(Participante participante) {
 		participante.setNome(this.nome);
-		participante.setEndereco(this.endereco);
+//		participante.setEndereco(this.endereco);
 		
 		return participante;
 	}

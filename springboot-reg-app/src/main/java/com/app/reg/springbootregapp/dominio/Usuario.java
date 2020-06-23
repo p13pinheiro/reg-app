@@ -1,39 +1,62 @@
 package com.app.reg.springbootregapp.dominio;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class Usuario implements UserDetails{
 
 	private static final long serialVersionUID = 9025250036381845574L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String id;
 	private String nome;
 	private String email;
 	private String senha;
+	private Integer idade;
+	private String endereco;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+	private LocalDate dataNascimento;
+	private String cpf;
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Perfil> perfis = new ArrayList<>();
 	
-	public Long getId() {
+	public Usuario() {}
+	
+	public Usuario(String id, String nome, String email, String senha, List<Perfil> perfis) {
+		this.id = id;
+		this.nome = nome;
+		this.email = email;
+		this.senha = senha;
+		this.perfis = perfis;
+	}
+	
+	public Usuario(String nome, String email, String senha, Integer idade, String endereco, LocalDate dataNascimento, String cpf) {
+		this.nome = nome;
+		this.email = email;
+		this.senha = senha;
+		this.idade = idade;
+		this.endereco = endereco;
+		this.dataNascimento = dataNascimento;
+		this.cpf = cpf;
+	}
+
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -82,6 +105,38 @@ public class Usuario implements UserDetails{
 	@Override
 	public String getUsername() {
 		return this.email;
+	}
+
+	public Integer getIdade() {
+		return idade;
+	}
+
+	public void setIdade(Integer idade) {
+		this.idade = idade;
+	}
+
+	public String getEndereco() {
+		return endereco;
+	}
+
+	public void setEndereco(String endereco) {
+		this.endereco = endereco;
+	}
+
+	public LocalDate getDataNascimento() {
+		return dataNascimento;
+	}
+
+	public void setDataNascimento(LocalDate dataNascimento) {
+		this.dataNascimento = dataNascimento;
+	}
+
+	public String getCpf() {
+		return cpf;
+	}
+
+	public void setCpf(String cpf) {
+		this.cpf = cpf;
 	}
 
 	@Override

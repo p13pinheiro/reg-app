@@ -1,16 +1,18 @@
 package com.app.reg.springbootregapp.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 
 import com.app.reg.springbootregapp.dominio.Evento;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class EventoDTO {
 	
 	private String id;
 	private String nome;
-	private Date data;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+	private LocalDateTime data;
 	private String local;
 	
 	public EventoDTO(Evento evento) {
@@ -36,10 +38,10 @@ public class EventoDTO {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public Date getData() {
+	public LocalDateTime getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(LocalDateTime data) {
 		this.data = data;
 	}
 	public String getLocal() {

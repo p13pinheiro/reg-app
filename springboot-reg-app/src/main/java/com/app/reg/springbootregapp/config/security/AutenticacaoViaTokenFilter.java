@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bson.types.ObjectId;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,8 +38,8 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter{
 	}
 
 	private void auntenticarCliente(String token) {
-		Long id = tokenService.obterIdUsuario(token);
-		Usuario usuario = usuarioRepository.findById(id).get();
+		String id = tokenService.obterIdUsuario(token);
+		Usuario usuario = usuarioRepository.findById(new ObjectId(id)).get();
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 	}

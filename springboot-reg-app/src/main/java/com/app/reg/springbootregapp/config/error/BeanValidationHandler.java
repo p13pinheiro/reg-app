@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.app.reg.springbootregapp.config.error.dto.ErrorFormularioDTO;
+import com.app.reg.springbootregapp.config.error.dto.ErrorUsuarioDTO;
+import com.app.reg.springbootregapp.config.error.exception.ParticipanteEventoException;
+import com.mongodb.MongoWriteException;
 
 @RestControllerAdvice
 public class BeanValidationHandler {
@@ -35,5 +38,20 @@ public class BeanValidationHandler {
 		});
 		
 		return erros;
+	}
+	
+	@ResponseStatus(code = HttpStatus.NOT_FOUND)
+	@ExceptionHandler(ParticipanteEventoException.class)
+	public ErrorUsuarioDTO handleParticipanteNaoEncontrado(ParticipanteEventoException exception) {
+		String mensagem = exception.getMessage();
+
+		return new ErrorUsuarioDTO(mensagem);
+	}
+	
+	@ResponseStatus(code = HttpStatus.NOT_ACCEPTABLE)
+	@ExceptionHandler(MongoWriteException.class)
+	public ErrorUsuarioDTO hadleParticipanteJaAdicionadoNoEvento(MongoWriteException exception) {
+		
+		return new ErrorUsuarioDTO("Usuário já cadastrado no sistema. Esqueceu a senha?");
 	}
 }

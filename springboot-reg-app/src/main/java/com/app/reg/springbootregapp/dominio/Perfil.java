@@ -1,20 +1,15 @@
 package com.app.reg.springbootregapp.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import org.springframework.security.core.GrantedAuthority;
 
-@Entity
+//@Entity
 public class Perfil implements GrantedAuthority{
 
 	private static final long serialVersionUID = -7217963323993179746L;
 
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	

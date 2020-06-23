@@ -1,115 +1,95 @@
 package com.app.reg.springbootregapp.dominio;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import org.bson.types.ObjectId;
 
-import org.hibernate.validator.constraints.Length;
-
-@Entity
 public class Participante {
-
+	
+	private ObjectId idUsuario;
+	private String nome;
+	private String email;
+	
 	public Participante() {	}
 	
-	public Participante(String nome, Integer idade, String endereco) {
+	public Participante(ObjectId idUsuario, String nome, String email) {
+		this.idUsuario = idUsuario;
 		this.nome = nome;
-		this.idade = idade;
-		this.endereco = endereco;
+		this.email = email;
 	}
 	
-	public Participante(Long id, String nome, Integer idade, String endereco) {
-		this.id = id;
+	public Participante(String nome, String email) {
 		this.nome = nome;
-		this.idade = idade;
-		this.endereco = endereco;
-	}
-	
-	public Participante(String nome) {
-		this.nome = nome;
+		this.email = email;
 	}
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@NotNull
-	@Length(min = 2, max = 50)
-	private String nome;
-	
-	private Integer idade;
+	public ObjectId getIdUsuario() {
+		return idUsuario;
+	}
 
-	@Length(max = 50)
-	private String endereco;
-	
-	public Long getId() {
-		return id;
+	public void setIdUsuario(ObjectId idUsuario) {
+		this.idUsuario = idUsuario;
 	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+
 	public String getNome() {
 		return nome;
 	}
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public Integer getIdade() {
-		return idade;
+	
+	public String getEmail() {
+		return email;
 	}
-	public void setIdade(Integer idade) {
-		this.idade = idade;
-	}
-	public String getEndereco() {
-		return endereco;
-	}
-	public void setEndereco(String endereco) {
-		this.endereco = endereco;
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((endereco == null) ? 0 : endereco.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((idade == null) ? 0 : idade.hashCode());
+		result = prime * result + ((idUsuario == null) ? 0 : idUsuario.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
+		
 		Participante other = (Participante) obj;
-		if (endereco == null) {
-			if (other.endereco != null)
+		
+		if (idUsuario == null) {
+			if (other.idUsuario != null) {
 				return false;
-		} else if (!endereco.equals(other.endereco))
+			}
+		} else if (!idUsuario.equals(other.idUsuario)) {
 			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (idade == null) {
-			if (other.idade != null)
-				return false;
-		} else if (!idade.equals(other.idade))
-			return false;
+		}
 		if (nome == null) {
-			if (other.nome != null)
+			if (other.nome != null) {
 				return false;
-		} else if (!nome.equals(other.nome))
+			}
+		} else if (!nome.equals(other.nome)) {
 			return false;
+		}
+		if (email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!email.equals(other.nome)) {
+			return false;
+		}
 		return true;
 	}
-	
-	
+
 }

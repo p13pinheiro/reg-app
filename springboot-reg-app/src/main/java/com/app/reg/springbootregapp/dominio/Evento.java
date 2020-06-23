@@ -1,6 +1,6 @@
 package com.app.reg.springbootregapp.dominio;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Id;
@@ -11,13 +11,17 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@Service
 public class Evento {
 	
 	public Evento() {
 	}
 
-	public Evento(String id, String nome, Date data, String local, List<Participante> participantes, List<Produto> produtos) {
+	public Evento(String id, String nome, LocalDateTime data, String local, List<Participante> participantes, List<Produto> produtos) {
 		this.id = id;
 		this.nome = nome;
 		this.data = data;
@@ -26,13 +30,13 @@ public class Evento {
 		this.produtos = produtos;
 	}
 	
-	public Evento(String nome, Date data, String local) {
+	public Evento(String nome, LocalDateTime data, String local) {
 		this.nome = nome;
 		this.data = data;
 		this.local = local;
 	}
 
-	public Evento(String nome, Date data, String local, List<Participante> participantes, List<Produto> produtos) {
+	public Evento(String nome, LocalDateTime data, String local, List<Participante> participantes, List<Produto> produtos) {
 		this.nome = nome;
 		this.data = data;
 		this.local = local;
@@ -50,7 +54,8 @@ public class Evento {
 	
 	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	@NotNull
-	private Date data;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+	private LocalDateTime data;
 	
 	@Length(max = 50)
 	@NotNull
@@ -76,10 +81,10 @@ public class Evento {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	public Date getData() {
+	public LocalDateTime getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(LocalDateTime data) {
 		this.data = data;
 	}
 	public String getLocal() {
@@ -103,6 +108,21 @@ public class Evento {
 		this.produtos = produtos;
 	}
 
+	public Double getValorTotal() {
+		if(this.getProdutos() !=  null) {
+			return this.getProdutos().stream().mapToDouble(p -> p.getPreco() * p.getQuantidade()).sum();
+		}
+		return 0.0;
+	}
+	
+	public Double getValorPorParticipante(Double valorTotal) {
+		if(this.participantes != null && !this.participantes.isEmpty() && valorTotal != null) {
+			return (double) valorTotal/this.participantes.size();
+		}
+		
+		return 0.0;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
